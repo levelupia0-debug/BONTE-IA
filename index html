@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BONTE IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@800&display=swap');
+        
+        body, html {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        h1, h2, .b-logo {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Scrollbar customisée */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+        /* Pour cacher la sidebar sur mobile */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        #sidebar.hidden-mobile {
+            transform: translateX(-100%);
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex">
+
+    <aside id="sidebar" class="w-64 h-full bg-[#0a0a0a] border-r border-gray-800 p-4 flex-col fixed inset-y-0 left-0 z-20
+                            md:static md:flex md:translate-x-0
+                            hidden-mobile">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full border border-purple-500/50 flex items-center justify-center text-xl font-bold b-logo">B</div>
+                <h2 class="text-xl font-bold">BONTE IA</h2>
+            </div>
+            <button id="close-menu-btn" class="md:hidden p-1 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Nouveau Chat
+        </button>
+
+        <nav id="chat-history" class="flex-1 mt-6 overflow-y-auto space-y-2">
+            <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Historique</p>
+            <a href="#" class="block text-sm text-gray-300 hover:bg-gray-800 p-2 rounded-lg truncate">Analyse "French Roast"</a>
+            <a href="#" class="block text-sm text-gray-300 hover:bg-gray-800 p-2 rounded-lg truncate">Idées pour Level Up</a>
+        </nav>
+
+        <div id="user-profile" class="mt-auto border-t border-gray-800 pt-4">
+            </div>
+    </aside>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-10 md:hidden hidden"></div>
+
+    <main class="flex-1 h-full flex flex-col bg-black">
+        
+        <header class="md:hidden flex items-center justify-between p-4 border-b border-gray-800">
+            <button id="open-menu-btn" class="p-1 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <h2 class="text-lg font-bold">BONTE IA</h2>
+            <div class="w-6"></div> </header>
+
+        <div id="message-list" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full border border-purple-500/50 flex items-center justify-center text-xl font-bold b-logo flex-shrink-0">B</div>
+                <div class="text-white pt-1">
+                    Bonjour ! Je suis BONTE IA, votre assistant personnel. Comment puis-je vous aider aujourd'hui ?
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <div class="bg-blue-600 text-white p-3 rounded-xl max-w-lg">
+                    C'est quoi, une Progressive Web App ?
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="p-4 md:p-6 border-t border-gray-800">
+            <form id="chat-form" class="flex items-center gap-3">
+                <input type="text" id="prompt-input" placeholder="Envoyer un message à BONTE IA..." 
+                       class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                
+                <button type="submit" id="action-button" class="w-12 h-12 bg-purple-600 hover:bg-purple-700 rounded-full flex items-center justify-center flex-shrink-0 transition-colors">
+                    
+                    <svg id="mic-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                    
+                    <svg id="send-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    
+                    <svg id="stop-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12v0a9 9 0 01-9 9s-9-4-9-9s4-9 9-9s9 4 9 9zM9 9l6 6m0-6l-6 6"></path></svg>
+                </button>
+            </form>
+            <p class="text-xs text-gray-600 text-center mt-3">BONTE IA v1.0 - Level Up</p>
+        </div>
+
+    </main>
+
+    <script type="module">
+        // --- Imports Firebase ---
+        // (Assure-toi que c'est le même firebase-app.js que sur ta page de login)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        
+        // !!! UTILISE EXACTEMENT LA MÊME CONFIG QUE TON FICHIER DE CONNEXION !!!
+        const firebaseConfig = {
+          apiKey: "AIzaSyDQPdQFdFFk4s21O1-rFa6QvaeZUIGRutM",
+          authDomain: "level-up-ia-bef78.firebaseapp.com",
+          projectId: "level-up-ia-bef78",
+          storageBucket: "level-up-ia-bef78.firebasestorage.app",
+          messagingSenderId: "1048725168557",
+          appId: "1:1048725168557:web:ac58365a74f9582856c124",
+          measurementId: "G-PE5HD66761"
+        };
+
+        // --- Initialisation ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- Éléments du DOM ---
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const openMenuBtn = document.getElementById('open-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const userProfileDiv = document.getElementById('user-profile');
+        
+        const promptInput = document.getElementById('prompt-input');
+        const actionButton = document.getElementById('action-button');
+        const micIcon = document.getElementById('mic-icon');
+        const sendIcon = document.getElementById('send-icon');
+        const stopIcon = document.getElementById('stop-icon'); // On le garde pour l'étape 2
+
+        // --- 1. GESTION DE L'AUTHENTIFICATION ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Utilisateur connecté.
+                // On affiche ses infos (simple pour l'instant)
+                console.log("Utilisateur connecté:", user.displayName);
+                userProfileDiv.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${user.photoURL || './default-avatar.png'}" alt="Avatar" class="w-8 h-8 rounded-full">
+                        <div>
+                            <p class="text-sm font-semibold text-white">${user.displayName || 'Utilisateur'}</p>
+                            <a href="#" id="logout-btn" class="text-xs text-red-500 hover:underline">Déconnexion</a>
+                        </div>
+                    </div>
+                `;
+                // Ajout du listener pour la déconnexion
+                document.getElementById('logout-btn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    signOut(auth).catch(console.error);
+                });
+            } else {
+                // Utilisateur non connecté ! Redirection vers la page de connexion.
+                // Assure-toi que ton fichier de connexion s'appelle bien 'login.html'
+                console.log("Aucun utilisateur, redirection...");
+                window.location.href = './login.html'; // <<< ADAPTE CE NOM SI BESOIN
+            }
+        });
+
+        // --- 2. GESTION DE L'INTERFACE (SIDEBAR) ---
+        function toggleSidebar() {
+            sidebar.classList.toggle('hidden-mobile');
+            overlay.classList.toggle('hidden');
+        }
+        openMenuBtn.addEventListener('click', toggleSidebar);
+        closeMenuBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+
+        // --- 3. GESTION DU BOUTON "INTELLIGENT" (UI SEULEMENT) ---
+        promptInput.addEventListener('input', () => {
+            const hasText = promptInput.value.trim().length > 0;
+            
+            // Si on n'est PAS en train de générer une réponse (on verra ça étape 2)
+            if (stopIcon.classList.contains('hidden')) {
+                micIcon.classList.toggle('hidden', hasText);
+                sendIcon.classList.toggle('hidden', !hasText);
+            }
+        });
+
+        // --- 4. GESTION DU CHAT (ÉTAPE SUIVANTE) ---
+        const chatForm = document.getElementById('chat-form');
+        
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Empêche la page de se recharger
+            const promptText = promptInput.value.trim();
+            
+            if (promptText) {
+                console.log("Envoi du message:", promptText);
+                // C'est ICI qu'on appellera l'IA (prochaine étape)
+                
+                // Pour l'instant, on vide juste l'input
+                promptInput.value = '';
+                // Et on remet l'icône micro
+                micIcon.classList.remove('hidden');
+                sendIcon.classList.add('hidden');
+            }
+        });
+
+    </script>
+</body>
+</html>
